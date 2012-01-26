@@ -1,14 +1,13 @@
-PullToRefresh
+Pullwalla
 
-A simple iPhone TableViewController for adding pull-to-refresh functionality.
+An extension of Leah Culver's PullToRefresh project which emulates the animated, checkered, pull-to-refresh bar in Gowalla's iPhone app.  The project has also been updated to support ARC.
 
 ![](http://s3.amazonaws.com/leah.baconfile.com/blog/refresh-small-1.png)
 ![](http://s3.amazonaws.com/leah.baconfile.com/blog/refresh-small-2.png)
 ![](http://s3.amazonaws.com/leah.baconfile.com/blog/refresh-small-3.png)
 ![](http://s3.amazonaws.com/leah.baconfile.com/blog/refresh-small-4.png)
 
-Inspired by [Tweetie 2](http://www.atebits.com/tweetie-iphone/), [Oliver Drobnik's blog post](http://www.drobnik.com/touch/2009/12/how-to-make-a-pull-to-reload-tableview-just-like-tweetie-2/)
-and [EGOTableViewPullRefresh](http://github.com/enormego/EGOTableViewPullRefresh).
+Inspired by [Gowalla](http://gowalla.com/).
 
 
 How to intall

@@ -1,5 +1,5 @@
 //
-//  PullRefreshTableViewController.m
+//  PullRefreshTableViewController.h
 //  Plancast
 //
 //  Created by Leah Culver on 7/2/10.
@@ -30,69 +30,63 @@
 #import <QuartzCore/QuartzCore.h>
 #import "PullRefreshTableViewController.h"
 
-#define REFRESH_HEADER_HEIGHT 52.0f
-
+#define REFRESH_HEADER_HEIGHT 5.0f
 
 @implementation PullRefreshTableViewController
 
-@synthesize textPull, textRelease, textLoading, refreshHeaderView, refreshLabel, refreshArrow, refreshSpinner;
+@synthesize refreshHeaderView, refreshArrow, colorGrid;
 
 - (id)initWithStyle:(UITableViewStyle)style {
-  self = [super initWithStyle:style];
-  if (self != nil) {
-    [self setupStrings];
-  }
-  return self;
+    self = [super initWithStyle:style];
+    if (self != nil) {
+    }
+    return self;
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-  self = [super initWithCoder:aDecoder];
-  if (self != nil) {
-    [self setupStrings];
-  }
-  return self;
+    self = [super initWithCoder:aDecoder];
+    if (self != nil) {
+    }
+    return self;
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-  if (self != nil) {
-    [self setupStrings];
-  }
-  return self;
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self != nil) {
+    }
+    return self;
 }
 
 - (void)viewDidLoad {
-  [super viewDidLoad];
-  [self addPullToRefreshHeader];
-}
-
-- (void)setupStrings{
-  textPull = [[NSString alloc] initWithString:@"Pull down to refresh..."];
-  textRelease = [[NSString alloc] initWithString:@"Release to refresh..."];
-  textLoading = [[NSString alloc] initWithString:@"Loading..."];
+    [super viewDidLoad];
+    [self addPullToRefreshHeader];
 }
 
 - (void)addPullToRefreshHeader {
+    
+    // Load color settings
+    NSString *settingsPath = [[NSBundle mainBundle] pathForResource:@"Colors" 
+                                                             ofType:@"plist"];
+    
+    NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:settingsPath];
+    
+    // Grab an array of predefined colors
+    NSArray *colors = [settings objectForKey:@"Colors"];
+
     refreshHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0 - REFRESH_HEADER_HEIGHT, 320, REFRESH_HEADER_HEIGHT)];
     refreshHeaderView.backgroundColor = [UIColor clearColor];
-
-    refreshLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, REFRESH_HEADER_HEIGHT)];
-    refreshLabel.backgroundColor = [UIColor clearColor];
-    refreshLabel.font = [UIFont boldSystemFontOfSize:12.0];
-    refreshLabel.textAlignment = UITextAlignmentCenter;
-
+    
+    // Create the loading color grid
+    colorGrid = [[ColorGrid alloc] initWithFrame:CGRectMake(0, 0 - ROWS * CELL_DIMENSION, COLUMNS * CELL_DIMENSION, ROWS * CELL_DIMENSION) 
+                                          colors:colors];
+    
     refreshArrow = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"arrow.png"]];
-    refreshArrow.frame = CGRectMake(floorf((REFRESH_HEADER_HEIGHT - 27) / 2),
-                                    (floorf(REFRESH_HEADER_HEIGHT - 44) / 2),
-                                    27, 44);
+    refreshArrow.frame = CGRectMake(floorf((COLUMNS * CELL_DIMENSION - 21.5) / 2),
+                                    floorf(REFRESH_HEADER_HEIGHT - 31),
+                                    21.5, 21);
 
-    refreshSpinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    refreshSpinner.frame = CGRectMake(floorf(floorf(REFRESH_HEADER_HEIGHT - 20) / 2), floorf((REFRESH_HEADER_HEIGHT - 20) / 2), 20, 20);
-    refreshSpinner.hidesWhenStopped = YES;
-
-    [refreshHeaderView addSubview:refreshLabel];
     [refreshHeaderView addSubview:refreshArrow];
-    [refreshHeaderView addSubview:refreshSpinner];
+    [self.tableView addSubview:colorGrid];
     [self.tableView addSubview:refreshHeaderView];
 }
 
@@ -113,10 +107,8 @@
         [UIView beginAnimations:nil context:NULL];
         if (scrollView.contentOffset.y < -REFRESH_HEADER_HEIGHT) {
             // User is scrolling above the header
-            refreshLabel.text = self.textRelease;
             [refreshArrow layer].transform = CATransform3DMakeRotation(M_PI, 0, 0, 1);
         } else { // User is scrolling somewhere within the header
-            refreshLabel.text = self.textPull;
             [refreshArrow layer].transform = CATransform3DMakeRotation(M_PI * 2, 0, 0, 1);
         }
         [UIView commitAnimations];
@@ -134,23 +126,24 @@
 
 - (void)startLoading {
     isLoading = YES;
-
-    // Show the header
+    
+    // Show the header and animate the loading color grid
+    [colorGrid drawGrid];
     [UIView beginAnimations:nil context:NULL];
+
     [UIView setAnimationDuration:0.3];
     self.tableView.contentInset = UIEdgeInsetsMake(REFRESH_HEADER_HEIGHT, 0, 0, 0);
-    refreshLabel.text = self.textLoading;
     refreshArrow.hidden = YES;
-    [refreshSpinner startAnimating];
-    [UIView commitAnimations];
 
+    [UIView commitAnimations];
+    
     // Refresh action!
     [self refresh];
 }
 
 - (void)stopLoading {
     isLoading = NO;
-
+    
     // Hide the header
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDelegate:self];
@@ -166,26 +159,15 @@
 
 - (void)stopLoadingComplete:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
     // Reset the header
-    refreshLabel.text = self.textPull;
     refreshArrow.hidden = NO;
-    [refreshSpinner stopAnimating];
+    // Reset the color loading grid.
+    [colorGrid drawRow];
 }
 
 - (void)refresh {
     // This is just a demo. Override this method with your custom reload action.
     // Don't forget to call stopLoading at the end.
-    [self performSelector:@selector(stopLoading) withObject:nil afterDelay:2.0];
-}
-
-- (void)dealloc {
-    [refreshHeaderView release];
-    [refreshLabel release];
-    [refreshArrow release];
-    [refreshSpinner release];
-    [textPull release];
-    [textRelease release];
-    [textLoading release];
-    [super dealloc];
+    [self performSelector:@selector(stopLoading) withObject:nil afterDelay:1.0];
 }
 
 @end

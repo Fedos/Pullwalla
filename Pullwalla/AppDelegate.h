@@ -1,5 +1,5 @@
 //
-//  PullToRefreshAppDelegate.h
+//  AppDelegate.h
 //  PullToRefresh
 //
 //  Created by Leah Culver on 7/25/10.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PullToRefreshAppDelegate : NSObject <UIApplicationDelegate> {
+@interface AppDelegate : NSObject <UIApplicationDelegate> {
     UIWindow *window;
     UINavigationController *navigationController;
 }
@@ -17,4 +17,3 @@
 @property (nonatomic, retain) UINavigationController *navigationController;
 
 @end
-
