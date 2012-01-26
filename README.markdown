@@ -2,8 +2,12 @@ Pullwalla
 
 An extension of Leah Culver's PullToRefresh project which emulates the animated, checkered, pull-to-refresh bar in Gowalla's iPhone app.  The project has also been updated to support ARC.
 
-![](http://cluttr.com/downloads/pullwalla1.jpg)
-![](http://cluttr.com/downloads/pullwalla2.jpg)
+<div style="float:left;margin:0 10px 10px 0" markdown="1">
+    ![](http://cluttr.com/downloads/pullwalla1.jpg)
+</div>
+<div style="float:left;margin:0 10px 10px 0" markdown="1">
+    ![](http://cluttr.com/downloads/pullwalla2.jpg)
+</div>
 
 Inspired by [Gowalla](http://gowalla.com/), [Leah Culver](http://blog.leahculver.com/).
 
