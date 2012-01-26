@@ -14,7 +14,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.title = @"Pull to Refresh";
+    self.title = @"Pull List to Refresh";
     items = [[NSMutableArray alloc] initWithObjects:@"What time is it?", nil];
 }
 
